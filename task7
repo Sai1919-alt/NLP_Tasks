@@ -1,0 +1,27 @@
+import nltk
+from nltk.corpus import treebank
+from nltk.tag import hmm
+from nltk.probability import LidstoneProbDist
+
+nltk.download('treebank')
+tagged_sentences = treebank.tagged_sents()
+
+train_size = int(len(tagged_sentences) * 0.8)
+train_data = tagged_sentences[:train_size]
+test_data = tagged_sentences[train_size:]
+
+# Use Lidstone smoothing estimator for probability distribution
+estimator = lambda fd, bins: LidstoneProbDist(fd, 0.1)
+
+# Train the HMM POS tagger
+trainer = hmm.HiddenMarkovModelTrainer()
+hmm_tagger = trainer.train_supervised(train_data, estimator=estimator)
+
+# Input sentence to tag
+input_sentence = input("Enter the Sentence:").split()
+
+# Tag the input sentence
+tagged_sentence = hmm_tagger.tag(input_sentence)
+
+print("Input Sentence:", input_sentence)
+print("Tagged Sentence:", tagged_sentence)
